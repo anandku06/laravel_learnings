@@ -153,8 +153,8 @@ Route::controller(baseController::class)->group(function () {
 
 // prefix function example, this will add the prefix 'admin' to all the routes defined within the group, so the /dashboard route will become /admin/dashboard and the /settings route will become /admin/settings
 Route::prefix('admin')->group(function () {
-    Route::get('/dashboard', [baseController::class, 'index']); // This will call the 'index' method of the 'baseController' when the /admin/dashboard route is accessed
-    Route::get('/settings', [baseController::class, 'about']); // This will call the 'about' method of the 'baseController' when the /admin/settings route is accessed
+    Route::get('/home', [baseController::class, 'index']); // This will call the 'index' method of the 'baseController' when the /admin/dashboard route is accessed
+    Route::get('/about', [baseController::class, 'about']); // This will call the 'about' method of the 'baseController' when the /admin/settings route is accessed
 });
 
 // single controller
