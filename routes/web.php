@@ -3,6 +3,9 @@
 use App\Http\Controllers\baseController;
 use App\Http\Controllers\resController;
 use App\Http\Controllers\singleController;
+use App\Http\Middleware\countryCheck;
+use App\Http\Middleware\elgibleUser;
+use App\Http\Middleware\validUser;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -145,7 +148,7 @@ Route::get('/dash', function () {
 // using controllers example
 // Route::get('/base', [baseController::class, 'index']); // This will call the 'index' method of the 'baseController' when the /base route is accessed
 
-// group function example
+// group function example, this will group the routes together and apply the same controller to all the routes defined within the group, so the /base route will call the 'index' method of the 'baseController' and the /about-us route will call the 'about' method of the 'baseController'
 Route::controller(baseController::class)->group(function () {
     Route::get('/base', 'index'); // This will call the 'index' method of the 'baseController' when the /base route is accessed
     Route::get('/about-us', 'about'); // This will call the 'about' method of the 'baseController' when the /about-us route is accessed
@@ -155,13 +158,26 @@ Route::controller(baseController::class)->group(function () {
 Route::prefix('admin')->group(function () {
     Route::get('/home', [baseController::class, 'index']); // This will call the 'index' method of the 'baseController' when the /admin/dashboard route is accessed
     Route::get('/about', [baseController::class, 'about']); // This will call the 'about' method of the 'baseController' when the /admin/settings route is accessed
-});
+})->middleware(validUser::class); // This will apply the 'validUser' middleware to all the routes defined within the group, so only valid users will be able to access these routes, and if a user is not valid, they will receive a 403 Unauthorized response
 
 // single controller
 Route::get('/single', singleController::class);
 
 // // resource controller
 Route::resource('/resource', resController::class);
+
+// middleware example, this will apply the 'validUser' middleware to the /protected route, so only valid users will be able to access this route, and if a user is not valid, they will receive a 403 Unauthorized response
+Route::get('/protected', function () {
+    return 'This is a protected route that only valid users can access.';
+})->middleware(validUser::class); // This will apply the 'validUser' middleware to the /protected route, so only valid users will be able to access this route, and if a user is not valid, they will receive a 403 Unauthorized response
+
+Route::get('/eligible/{age}', function ($age) {
+    return 'This route is only accessible to eligible users.';
+})->middleware(elgibleUser::class); // This will apply the 'elgibleUser' middleware to the /eligible route, so only eligible users will be able to access this route, and if a user is not eligible, they will receive a 403 Unauthorized response
+
+Route::get('/country-check/{country}', function ($country) {
+    return 'This route is only accessible to users from allowed countries.';
+})->middleware(countryCheck::class); // This will apply the 'countryCheck' middleware to the /country-check route, so only users from allowed countries will be able to access this route, and if a user is not from an allowed country, they will receive a 403 Unauthorized response, and if a user is from an allowed country, they will receive a JSON response indicating that their country is allowed to access the route
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');

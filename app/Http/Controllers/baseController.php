@@ -13,9 +13,4 @@ class baseController extends Controller
     {
         return view('about');
     }
-
-    public function studentList() 
-    {
-        
-    }
 }
